@@ -38,6 +38,8 @@
 #include "port/port.h"
 #include "util/random.h"
 
+static int k_level;
+
 namespace ROCKSDB_NAMESPACE {
 
 template<typename Key, class Comparator>
@@ -444,6 +446,8 @@ SkipList<Key, Comparator>::SkipList(const Comparator cmp, Allocator* allocator,
 template<typename Key, class Comparator>
 void SkipList<Key, Comparator>::Insert(const Key& key) {
   // fast path for sequential insertion
+  //uint64_t temp_key = reinterpret_cast<long unsigned int>(key);
+  
   if (!KeyIsAfterNode(key, prev_[0]->NoBarrier_Next(0)) &&
       (prev_[0] == head_ || KeyIsAfterNode(key, prev_[0]))) {
     assert(prev_[0] != head_ || (prev_height_ == 1 && GetMaxHeight() == 1));
@@ -466,7 +470,9 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
   assert(prev_[0]->Next(0) == nullptr || !Equal(key, prev_[0]->Next(0)->key));
 
   int height = RandomHeight(); // Height is defined randomly - Lee Jeyeon.
-  if (height > GetMaxHeight()) { // Change Total skiplist heigth - Lee Jeyeon.
+  height = k_level; // Control Skiplist node level using historical data - Signal.Jin
+  
+  if (height > GetMaxHeight()) { // Change Total skiplist height - Lee Jeyeon.
     for (int i = GetMaxHeight(); i < height; i++) {
       prev_[i] = head_;
     }
@@ -481,8 +487,10 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
     // keys.  In the latter case the reader will use the new node.
     max_height_.store(height, std::memory_order_relaxed);
   }
-
-  Node* x = NewNode(key, height);
+  
+  
+  //printf("%d\n", height); // Signal.Jin
+  Node* x = NewNode(key, height); 
   for (int i = 0; i < height; i++) {
     // NoBarrier_SetNext() suffices since we will add a barrier when
     // we publish a pointer to "x" in prev[i].
