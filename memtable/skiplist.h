@@ -38,7 +38,7 @@
 #include "port/port.h"
 #include "util/random.h"
 
-static int k_level;
+//static int k_level;
 
 namespace ROCKSDB_NAMESPACE {
 
@@ -285,12 +285,14 @@ inline void SkipList<Key, Comparator>::Iterator::SeekToLast() {
 template<typename Key, class Comparator>
 int SkipList<Key, Comparator>::RandomHeight() {
   auto rnd = Random::GetTLSInstance();
+  //uint32_t rnd = rand();
 
   // Increase height with probability 1 in kBranching
   int height = 1;
-  while (height < kMaxHeight_ && rnd->Next() < kScaledInverseBranching_) {
+  while (height < kMaxHeight_ && rnd->Next() < kScaledInverseBranching_) { // rnd->Next()
     height++;
   }
+  //fprintf(stdout, "%d\n", height);
   assert(height > 0);
   assert(height <= kMaxHeight_);
   return height;
@@ -328,6 +330,7 @@ typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::
         ? 1 : compare_(next->key, key);
     if (cmp == 0 || (cmp > 0 && level == 0)) {
       //fprintf(stdout, "Count = %d\n", count);
+      //fprintf(stdout, "cmp = %d\n", cmp);
       return next;
     } else if (cmp < 0) {
       // Keep searching in this list
@@ -470,7 +473,7 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
   assert(prev_[0]->Next(0) == nullptr || !Equal(key, prev_[0]->Next(0)->key));
 
   int height = RandomHeight(); // Height is defined randomly - Lee Jeyeon.
-  height = k_level; // Control Skiplist node level using historical data - Signal.Jin
+  //height = k_level; // Control Skiplist node level using historical data - Signal.Jin
   
   if (height > GetMaxHeight()) { // Change Total skiplist height - Lee Jeyeon.
     for (int i = GetMaxHeight(); i < height; i++) {

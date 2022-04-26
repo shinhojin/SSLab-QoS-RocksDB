@@ -56,25 +56,115 @@ TEST_F(SkipTest, Empty) { // In here, Main step for Skiplist_test (Empty) - Sign
 }
 */
 /*
-TEST_F(SkipTest, SeqInsertAndLookupX) { // Skiplist test for Sequential Pattern (Find nothing) - Signal.Jin
+TEST_F(SkipTest, HJAllWork) { // Skiplist test for All Patterns - Signal.Jin
   const int N = 5000; // Write Count - Signal.Jin
   const int R = 2000; // Read Count - Signal.Jin
+  Random rnd(1000);
+  std::set<Key> keys;
+  Arena arena;
+  TestComparator cmp;
+  SkipList<Key, TestComparator> list(cmp, &arena);
+  init_zipf_generator(0, N);
+
+  //FILE *fp_sk_test;
+  
+  //fp_sk_test = fopen("Xseq_test_skiplist.txt", "at");
+
+  //struct timespec s_time, e_time;
+  //double r_time, avg_time = 0;
+
+  for (int i = 1; i < N; i++) {
+    Key key = i;
+    if (keys.insert(key).second) {
+      list.Insert(key);
+    }
+  }
+
+  for (int i = 1; i < R; i++) {
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
+    if (list.Contains(i)) { // Maybe estimate time in here - Signal.Jin
+      ASSERT_EQ(keys.count(i), 1U);
+    } else {
+      ASSERT_EQ(keys.count(i), 0U);
+    }
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //avg_time += r_time;
+  }
+  //fprintf(stdout, "Sequential True = %.2lf\n", avg_time/R);
+  //avg_time = 0;
+
+  for (int i = N + 1; i < N + R + 1; i++) { 
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
+    if (list.Contains(i)) { // Maybe estimate time in here - Signal.Jin
+      ASSERT_EQ(keys.count(i), 1U);
+    } else {
+      ASSERT_EQ(keys.count(i), 0U);
+    }
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //avg_time += r_time;
+  }
+  //fprintf(stdout, "Sequential False = %.2lf\n", avg_time/R);
+  //avg_time = 0;
+
+  for (int i = 0; i < R; i++) { 
+    Key Ukey = rnd.Next() % N; // Generate Random Key - Signal.Jin
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
+    if (list.Contains(Ukey)) { // Maybe estimate time in here - Signal.Jin
+      ASSERT_EQ(keys.count(Ukey), 1U);
+    } else {
+      ASSERT_EQ(keys.count(Ukey), 0U);
+    }
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //avg_time += r_time;
+  }
+  //fprintf(stdout, "Uniform Random = %.2lf\n", avg_time/R); // Signal.Jin
+  //avg_time = 0;
+
+  for (int i = 0; i < R; i++) { 
+    Key Zkey = nextValue() % N; // Zipfian Key Pattern - Signal.Jin
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
+    if (list.Contains(Zkey)) { // Maybe estimate time in here - Signal.Jin
+      ASSERT_EQ(keys.count(Zkey), 1U);
+    } else {
+      ASSERT_EQ(keys.count(Zkey), 0U);
+    }
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //avg_time += r_time;
+  }
+  //fprintf(stdout, "Zipfian Random = %.2lf\n", avg_time/R); // Signal.Jin 
+
+}
+*/
+/*
+TEST_F(SkipTest, SeqInsertAndLookupX) { // Skiplist test for Sequential Pattern (Find nothing) - Signal.Jin
+  const int N = 50000; // Write Count - Signal.Jin
+  const int R = 25000; // Read Count - Signal.Jin
   std::set<Key> keys;
   Arena arena;
   TestComparator cmp;
   SkipList<Key, TestComparator> list(cmp, &arena);
 
-  FILE *fp_sk_test;
-  FILE *fp_level;
-  char level; int convert_level;
-  int count = 0;
+  //FILE *fp_sk_test;
+  //FILE *fp_level;
+  //char level; int convert_level;
+  //int count = 0;
   
-  fp_sk_test = fopen("Xseq_test_skiplist.txt", "at");
-  fp_level = fopen("level.txt", "r");
+  //fp_sk_test = fopen("Xseq_test_skiplist.txt", "at");
+  //fp_level = fopen("level.txt", "r");
 
-  struct timespec s_time, e_time;
-  double r_time;
+  //struct timespec s_time, e_time;
+  //double r_time;
 
+  for (int i = 1; i < N; i++) {
+    Key key = i;
+    if (keys.insert(key).second) {
+      list.Insert(key);
+    }
+  }
 
   do {
     level = getc(fp_level);
@@ -91,41 +181,48 @@ TEST_F(SkipTest, SeqInsertAndLookupX) { // Skiplist test for Sequential Pattern 
   } while((level != EOF) && (count > 5000));
 
   for (int i = N + 1; i < N + R + 1; i++) { 
-    clock_gettime(CLOCK_MONOTONIC, &s_time);
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
     if (list.Contains(i)) { // Maybe estimate time in here - Signal.Jin
       ASSERT_EQ(keys.count(i), 1U);
     } else {
       ASSERT_EQ(keys.count(i), 0U);
     }
-    clock_gettime(CLOCK_MONOTONIC, &e_time);
-    r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
-    fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin
   }
-  fclose(fp_sk_test);
+  //fclose(fp_sk_test);
 }
 */
 /*
 TEST_F(SkipTest, SeqInsertAndLookupO) { // Skiplist test for Sequential Pattern (Find all keys) - Signal.Jin
-  //const int N = 5000; // Write Count - Signal.Jin
-  const int R = 2000; // Read Count - Signal.Jin
+  const int N = 50000; // Write Count - Signal.Jin
+  const int R = 25000; // Read Count - Signal.Jin
   std::set<Key> keys;
   Arena arena;
   TestComparator cmp;
   SkipList<Key, TestComparator> list(cmp, &arena);
 
-  FILE *fp_sk_test;
-  FILE *fp_level;
-  char level; int convert_level;
-  int count = 0;
+  //FILE *fp_sk_test;
+  //FILE *fp_level;
+  //char level; int convert_level;
+  //int count = 0;
   
-  fp_sk_test = fopen("Oseq_test_skiplist.txt", "at");
-  fp_level = fopen("level.txt", "r");
+  //fp_sk_test = fopen("Oseq_test_skiplist.txt", "at");
+  //fp_level = fopen("level.txt", "r");
 
-  struct timespec s_time, e_time;
-  double r_time;
+  //struct timespec s_time, e_time;
+  //double r_time;
+
+  for (int i = 1; i < N; i++) {
+    Key key = i;
+    if (keys.insert(key).second) {
+      list.Insert(key);
+    }
+  }
 
   // Insert key sequential pattern in skiplist
-    
+
   do {
     level = getc(fp_level);
     if (isspace(level)) {
@@ -140,41 +237,49 @@ TEST_F(SkipTest, SeqInsertAndLookupO) { // Skiplist test for Sequential Pattern 
     count++;
   } while((level != EOF) && (count > 5000));
 
-  for (int i = 0; i < R; i++) { 
-    clock_gettime(CLOCK_MONOTONIC, &s_time);
+  int start_p = rand() % (N-R);
+  for (int i = start_p; i < R+start_p; i++) { 
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
     if (list.Contains(i)) { // Maybe estimate time in here - Signal.Jin
       ASSERT_EQ(keys.count(i), 1U);
     } 
     else {
       ASSERT_EQ(keys.count(i), 0U);
     }
-    clock_gettime(CLOCK_MONOTONIC, &e_time);
-    r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
-    fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin  
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin  
   }
-  fclose(fp_sk_test);
+  //fclose(fp_sk_test);
 }
 */
 /*
 TEST_F(SkipTest, UniRandInsertAndLookup) { // Skiplist test for Random Pattern - Signal.Jin
-  const int N = 5000; // Write Count - Signal.Jin
-  const int R = 2000; // Read Count - Signal.Jin
+  const int N = 50000; // Write Count - Signal.Jin
+  const int R = 25000; // Read Count - Signal.Jin
   Random rnd(1000);
   std::set<Key> keys;
   Arena arena;
   TestComparator cmp;
   SkipList<Key, TestComparator> list(cmp, &arena);
 
-  FILE *fp_sk_test;
-  FILE *fp_level;
-  char level; int convert_level;
-  int count = 0;
+  //FILE *fp_sk_test;
+  //FILE *fp_level;
+  //char level; int convert_level;
+  //int count = 0;
   
-  fp_sk_test = fopen("uni_rand_test_skiplist.txt", "at");
-  fp_level = fopen("level.txt", "r");
+  //fp_sk_test = fopen("uni_rand_test_skiplist.txt", "at");
+  //fp_level = fopen("level.txt", "r");
 
-  struct timespec s_time, e_time;
-  double r_time;
+  //struct timespec s_time, e_time;
+  //double r_time;
+
+  for (int i = 1; i < N; i++) {
+    Key key = i;
+    if (keys.insert(key).second) {
+      list.Insert(key);
+    }
+  }
 
   do {
     level = getc(fp_level);
@@ -192,23 +297,23 @@ TEST_F(SkipTest, UniRandInsertAndLookup) { // Skiplist test for Random Pattern -
 
   for (int i = 0; i < R; i++) { 
     Key Gkey = rnd.Next() % N; // Generate Random Key - Signal.Jin
-    clock_gettime(CLOCK_MONOTONIC, &s_time);
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
     if (list.Contains(Gkey)) { // Maybe estimate time in here - Signal.Jin
       ASSERT_EQ(keys.count(Gkey), 1U);
     } else {
       ASSERT_EQ(keys.count(Gkey), 0U);
     }
-    clock_gettime(CLOCK_MONOTONIC, &e_time);
-    r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
-    fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin 
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin 
   }
-  fclose(fp_sk_test);
+  //fclose(fp_sk_test);
 }
 */
 
 TEST_F(SkipTest, ZipRandInsertAndLookup) { // Skiplist test for Random Pattern - Signal.Jin
-  const int N = 5000; // Write Count - Signal.Jin
-  const int R = 2000; // Read Count - Signal.Jin
+  const int N = 50000; // Write Count - Signal.Jin
+  const int R = 25000; // Read Count - Signal.Jin
   Random rnd(1000);
   std::set<Key> keys;
   Arena arena;
@@ -219,17 +324,24 @@ TEST_F(SkipTest, ZipRandInsertAndLookup) { // Skiplist test for Random Pattern -
   //init_latestgen(N);
   init_zipf_generator(0, N);
 
-  FILE *fp_sk_test;
-  FILE *fp_level;
-  char level; int convert_level;
-  int count = 0;
+  //FILE *fp_sk_test;
+  //FILE *fp_level;
+  //char level; int convert_level;
+  //int count = 0;
   
-  fp_sk_test = fopen("zipf_rand_test_skiplist.txt", "at");
-  fp_level = fopen("level.txt", "r");
+  //fp_sk_test = fopen("zipf_rand_test_skiplist.txt", "at");
+  //fp_level = fopen("level.txt", "r");
 
-  struct timespec s_time, e_time;
-  double r_time;
+  //struct timespec s_time, e_time;
+  //double r_time;
 
+  for (int i = 1; i < N; i++) {
+    Key key = i;
+    if (keys.insert(key).second) {
+      list.Insert(key);
+    }
+  }
+/*
   do {
     level = getc(fp_level);
     if (isspace(level)) {
@@ -243,20 +355,20 @@ TEST_F(SkipTest, ZipRandInsertAndLookup) { // Skiplist test for Random Pattern -
     }
     count++;
   } while((level != EOF) && (count > 5000));
-
+*/
   for (int i = 0; i < R; i++) { 
     Key Gkey = nextValue() % N; // Zipfian Key Pattern - Signal.Jin
-    clock_gettime(CLOCK_MONOTONIC, &s_time);
+    //clock_gettime(CLOCK_MONOTONIC, &s_time);
     if (list.Contains(Gkey)) { // Maybe estimate time in here - Signal.Jin
       ASSERT_EQ(keys.count(Gkey), 1U);
     } else {
       ASSERT_EQ(keys.count(Gkey), 0U);
     }
-    clock_gettime(CLOCK_MONOTONIC, &e_time);
-    r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
-    fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin 
+    //clock_gettime(CLOCK_MONOTONIC, &e_time);
+    //r_time = (e_time.tv_sec - s_time.tv_sec) + (e_time.tv_nsec - s_time.tv_nsec)*0.001;
+    //fprintf(fp_sk_test, "%.2f\n", r_time); // Signal.Jin 
   }
-  fclose(fp_sk_test);
+  //fclose(fp_sk_test);
 }
 
 }  // namespace ROCKSDB_NAMESPACE
