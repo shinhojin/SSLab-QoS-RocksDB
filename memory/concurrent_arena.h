@@ -58,7 +58,6 @@ class ConcurrentArena : public Allocator {
     size_t rounded_up = ((bytes - 1) | (sizeof(void*) - 1)) + 1;
     assert(rounded_up >= bytes && rounded_up < bytes + sizeof(void*) &&
            (rounded_up % sizeof(void*)) == 0);
-
     return AllocateImpl(rounded_up, huge_page_size != 0 /*force_arena*/,
                         [this, rounded_up, huge_page_size, logger]() {
                           return arena_.AllocateAligned(rounded_up,
